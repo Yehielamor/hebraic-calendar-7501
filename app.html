@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hebraic Calendar | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #f8fafc;
+            --accent: #10b981;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --sidebar-bg: #1e293b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            padding: 0 1.5rem 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary-light);
+        }
+
+        .nav-links {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.9rem 1.5rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #334155;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-left p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .upgrade-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .upgrade-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            padding: 0.5rem;
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger);
+            border-radius: 50%;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .icon-1 { background-color: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .icon-2 { background-color: rgba(16, 185, 129, 0.1); color: var(--accent); }
+        .icon-3 { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .icon-4 { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        /* Chart & Activity */
+        .chart-activity {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1100px) {
+            .chart-activity {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container, .activity-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-container h2, .activity-container h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .activity-details h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-details p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            margin-left: auto;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo">
+            <span>✡</span> Hebraic<span>Calendar</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+            <li><a href="#"><span class="nav-icon">📅</span> Dual Calendar</a></li>
+            <li><a href="#"><span class="nav-icon">🔔</span> Reminders</a></li>
+            <li><a href="#"><span class="nav-icon">📖</span> Holiday Guide</a></li>
+            <li><a href="#"><span class="nav-icon">📈</span> Analytics</a></li>
+            <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            © 2026 Hebraic Calendar<br>
+            Version 2.1.0
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>Dashboard Overview</h1>
+                <p>Welcome back, David. Here's your Hebraic calendar summary.</p>
+            </div>
+            <div class="header-right">
+                <div class="upgrade-badge">Upgrade to Pro</div>
+                <button class="icon-btn">
+                    🔔
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-avatar">D</div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <section class="dashboard-content">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Upcoming Holidays</h3>
+                        <div class="number">7</div>
+                    </div>
+                    <div class="stat-icon icon-1">🎉</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Active Reminders</h3>
+                        <div class="number">12</div>
+                    </div>
+                    <div class="stat-icon icon-2">⏰</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Rosh Chodesh This Month</h3>
+                        <div class="number">2</div>
+                    </div>
+                    <div class="stat-icon icon-3">🌒</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Days Until Pesach</h3>
+                        <div class="number">42</div>
+                    </div>
+                    <div class="stat-icon icon-4">🍷</div>
+                </div>
+            </div>
+
+            <!-- Chart & Activity -->
+            <div class="chart-activity">
+                <div class="chart-container">
+                    <h2>Holiday Observance Trends 2026</h2>
+                    <canvas id="holidayChart"></canvas>
+                </div>
+                <div class="activity-container">
+                    <h2>Recent Activity</h2>
+                    <ul class="activity-list">
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background-color: var(--primary);">📅</div>
+                            <div class="activity-details">
+                                <h4>Added Reminder</h4>
+                                <p>Shabbat candle lighting for this week</p>
+                            </div>
+                            <div class="activity-time">2h ago</div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background-color: var(--accent);">🔔</div>
+                            <div class="activity-details">
+                                <h4>Holiday Notification</h4>
+                                <p>Purim is coming up in 3 weeks</p>
+                            </div>
+                            <div class="activity-time">1d ago</div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background-color: var(--warning);">✡</div>
+                            <div class="activity-details">
+                                <h4>Calendar Viewed</h4>
+                                <p>You checked Nissan 5786 details</p>
+                            </div>
+                            <div class="activity-time">2d ago</div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background-color: var(--danger);">📱</div>
+                            <div class="activity-details">
+                                <h4>Sync Completed</h4>
+                                <p>All reminders synced to mobile</p>
+                            </div>
+                            <div class="activity-time">3d ago</div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background-color: #8b5cf6;">🌒</div>
+                            <div class="activity-details">
+                                <h4>Rosh Chodesh Alert</h4>
+                                <p>Marked Rosh Chodesh Iyar observed</p>
+                            </div>
+                            <div class="activity-time">5d ago</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            Hebraic Calendar • 2026 Dual Calendar • Data synced in real-time • <a href="#" style="color: var(--primary);">Help & Support</a>
+        </footer>
+    </main>
+
+    <script>
+        // Auth check
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'auth.html';
+        }
+
+        // Mock Data
+        const mockUser = {
+            name: 'David Cohen',
+            avatar: 'D',
+            plan: 'Free',
+            nextHoliday: 'Pesach',
+            daysToHoliday: 42
+        };
+
+        const mockStats = {
+            upcomingHolidays: 7,
+            activeReminders: 12,
+            roshChodeshThisMonth: 2,
+            daysUntilPesach: 42
+        };
+
+        const mockActivities = [
+            { icon: '📅', title: 'Added Reminder', desc: 'Shabbat candle lighting for this week', time: '2h ago', color: '#6366f1' },
+            { icon: '🔔', title: 'Holiday Notification', desc: 'Purim is coming up in 3 weeks', time: '1d ago', color: '#10b981' },
+            { icon: '✡', title: 'Calendar Viewed', desc: 'You checked Nissan 5786 details', time: '2d ago', color: '#f59e0b' },
+            { icon: '📱', title: 'Sync Completed', desc: 'All reminders synced to mobile', time: '3d ago', color: '#ef4444' },
+            { icon: '🌒', title: 'Rosh Chodesh Alert', desc: 'Marked Rosh Chodesh Iyar observed', time: '5d ago', color: '#8b5cf6' }
+        ];
+
+        // Chart.js Implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('holidayChart').getContext('2d');
+            const holidayChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Major Holidays',
+                        data: [2, 1, 3, 4, 1, 0, 0, 1, 3, 2, 1, 2],
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: '#6366f1',
+                        borderWidth: 1
+                    }, {
+                        label: 'Rosh Chodesh',
+                        data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: '#10b981',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            title: {
+                                display: true,
+                                text: 'Number of Events'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Simulate real-time updates
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                console.log(`[${timeString}] Hebraic Calendar sync check performed.`);
+            }, 30000);
+        });
+
+        // Upgrade badge interaction
+        document.querySelector('.upgrade-badge').addEventListener('click', function() {
+            alert('Pro features: Advanced analytics, unlimited reminders, ad-free experience, and priority support! Redirecting to upgrade page...');
+            // In a real app, would navigate to upgrade page
+        });
+
+        // Notification bell interaction
+        document.querySelector('.icon-btn').addEventListener('click', function() {
+            alert('You have 3 unread notifications:\n1. Purim reminder set\n2. New feature: Holiday recipes\n3. Sync completed successfully');
+        });
+    </script>
+</body>
+</html>
