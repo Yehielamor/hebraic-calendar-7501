@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hebraic Calendar | Authentication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 15px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #6366f1;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: #cbd5e1;
+            font-weight: 300;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 32px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #94a3b8;
+        }
+
+        .tab.active {
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-container {
+            position: relative;
+            min-height: 340px;
+        }
+
+        .form {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .form.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f8fafc;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: -10px;
+            margin-bottom: 25px;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #6366f1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .divider span {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .google-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="%23EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="%2334A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="%234285F4" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="%23FBBC05" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 25px;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Home
+            </a>
+            <h1 class="logo">Hebraic Calendar</h1>
+            <p class="tagline">Sacred time, modern interface</p>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="signin">Sign In</div>
+                <div class="tab" data-tab="signup">Sign Up</div>
+            </div>
+
+            <div class="form-container">
+                <!-- Sign In Form -->
+                <form id="signin-form" class="form active">
+                    <div class="form-group">
+                        <label class="form-label" for="signin-email">Email Address</label>
+                        <input type="email" id="signin-email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signin-password">Password</label>
+                        <input type="password" id="signin-password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="signup-form" class="form">
+                    <div class="form-group">
+                        <label class="form-label" for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" class="form-input" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signup-password">Password</label>
+                        <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+            </div>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <button class="google-btn">
+                <div class="google-icon"></div>
+                Continue with Google
+            </button>
+
+            <div class="footer">
+                <p>By continuing, you agree to our Terms & Privacy Policy</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('.form');
+
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Show corresponding form
+                    forms.forEach(form => {
+                        form.classList.remove('active');
+                        if (form.id === `${targetTab}-form`) {
+                            form.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Mock Sign In
+            document.getElementById('signin-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+
+                // Simple validation
+                if (!email || !password) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+
+                // Mock authentication
+                localStorage.setItem('authToken', 'mock-token-' + Date.now());
+                alert('Sign in successful! Redirecting...');
+                window.location.href = 'app.html';
+            });
+
+            // Mock Sign Up
+            document.getElementById('signup-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirm = document.getElementById('signup-confirm').value;
+
+                // Validation
+                if (!name || !email || !password || !confirm) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+
+                if (password !== confirm) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters.');
+                    return;
+                }
+
+                // Mock registration
+                localStorage.setItem('authToken', 'mock-token-' + Date.now());
+                localStorage.setItem('userName', name);
+                alert('Account created successfully! Redirecting...');
+                window.location.href = 'app.html';
+            });
+
+            // Google button (visual only)
+            document.querySelector('.google-btn').addEventListener('click', function() {
+                alert('Google authentication is for demonstration only.');
+            });
+
+            // Forgot password link
+            document.querySelector('.forgot-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('A password reset link would be sent to your email.');
+            });
+        });
+    </script>
+</body>
+</html>
